@@ -11,11 +11,11 @@
  */
 function currency_converter_admin_settings() {
 
-  $default_weight = array('BYR' => 0, 'RON' => 1, 'RUB' => 1, 'EUR' => 2, 'USD' => 3, 'CAD' => 4, 'PLN' => 5, 'UAH' => 6, 'CNY' => 7, 'LTL' => 8, 'LVL' => 9);     
+  $default_weight = array('BYR' => 0, 'AUD' => 1, 'RON' => 1, 'EUR' => 2, 'USD' => 3, 'CAD' => 4, 'PLN' => 5, 'UAH' => 6, 'CNY' => 7, 'LTL' => 8, 'LVL' => 9);     
   $weight = variable_get('currency_converter_weight', $default_weight);
   asort($weight);
   
-  $default_currency = variable_get('currency_converter_main_currency', 'RON');
+  $default_currency = variable_get('currency_converter_main_currency', 'BYR');
   $currencies = array();
   $currencies[] = $default_currency;
 
@@ -41,7 +41,7 @@ function currency_converter_admin_settings() {
 
   $form['currency_converter_main_currency'] = array(
     '#type' => 'radios', 
-    '#default_value' => variable_get('currency_converter_main_currency', 'RON'),
+    '#default_value' => variable_get('currency_converter_main_currency', 'BYR'),
     '#options' => $options,
   );  
   $form['currency_converter_currency_types'] = array(

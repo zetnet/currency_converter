@@ -166,7 +166,7 @@ function currency_converter_cron() {
     $check = db_select('currency_converter', 'c')->fields('c')->condition('conv_type', 1, '=')->execute()->fetchAssoc();      
 
     if ($check) {
-      $fields = array('byr' => $byr, 'ron' => $ron, 'aud' => $aud, 'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time);
+      $fields = array('byr' => $byr, 'aud' => $aud, 'ron' => $ron, 'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time);
       db_update('currency_converter')->condition('conv_type', 1)->fields($fields)->execute();      
     }
     else {
