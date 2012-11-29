@@ -20,6 +20,12 @@ div#currency_converter div.byr {
   padding-left: 29px;
 }
 
+div#currency_converter div.ron {
+	background: url(images/ron.png) no-repeat left center;
+  height: 35px;
+  padding-left: 29px;
+}
+
 div#currency_converter div.rub {
 	background: url(images/rub.png) no-repeat left center;
   height: 35px;

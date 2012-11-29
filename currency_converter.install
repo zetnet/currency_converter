@@ -47,7 +47,12 @@ function currency_converter_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),  
-      'rub' => array(
+      'aud' => array(
+        'type' => 'float',
+        'not null' => TRUE,
+        'default' => 0,
+      ),  
+      'ron' => array(
         'type' => 'float',
         'not null' => TRUE,
         'default' => 0,

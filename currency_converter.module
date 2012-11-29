@@ -67,14 +67,17 @@ function currency_converter_cron() {
   $time = time();
 
   //Belorussian bank
-  $xmlstr = file_get_contents('http://www.priorbank.by/CurratesExportXml.axd?channel=1' );
+  $xmlstr = file_get_contents('http://www.priorbank.by/CurratesExportXml.axd?channel=4' );
   
   if ($xmlstr) {
     $xml = new SimpleXMLElement($xmlstr);
   
     foreach ($xml->LIST_R_DATE->R_DATE->LIST_E_CHANNEL->E_CHANNEL->LIST_RATE->RATE as $rate) {
-      if ($rate->ISO == 'RUB') {
-        $rub = number_format((float)$rate->BUY, 2, '.', '');
+      if ($rate->ISO == 'AUD') {
+        $aud = number_format((float)$rate->BUY, 2, '.', '');
+      }
+      if ($rate->ISO == 'RON') {
+        $ron = number_format((float)$rate->BUY, 2, '.', '');
       }
       if ($rate->ISO == 'EUR') {
         $eur = number_format((float)$rate->BUY, 2, '.', '');
@@ -105,7 +108,7 @@ function currency_converter_cron() {
     $check = db_select('currency_converter', 'c')->fields('c')->condition('conv_type', 0, '=')->execute()->fetchAssoc();
 
     if ($check) {      
-      $fields = array('rub' => $rub, 'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time);
+      $fields = array('aud' => $aud, 'ron' => $ron,  'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time);
       db_update('currency_converter')->condition('conv_type', 0)->fields($fields)->execute();
     }
     else {
@@ -114,7 +117,7 @@ function currency_converter_cron() {
         'seo', 'раскрутка сайтов', 'раскрутка сайта', 'реклама в интернете'
       );
       $signature_selected = $signature[rand(0, 8)];      
-      $fields = array('conv_type' => 0, 'byr' => 0, 'rub' => $rub, 'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time, 'signature' => $signature_selected);
+      $fields = array('conv_type' => 0, 'byr' => 0,  'aud' => $aud, 'ron' => $ron,'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time, 'signature' => $signature_selected);
       db_insert('currency_converter')->fields($fields)->execute();      
     }  
   }
@@ -130,6 +133,9 @@ function currency_converter_cron() {
 
       if ($rate->CharCode == 'BYR') {
         $byr = number_format(str_replace(',' , '.', $rate->Value ) / $rate->Nominal , 4, '.', '');
+      }
+      if ($rate->CharCode == 'RON') {
+        $ron = number_format(str_replace(',' , '.', $rate->Value ) / $rate->Nominal , 4, '.', '');
       }
       if ($rate->CharCode == 'EUR')  {
         $eur = number_format(str_replace(',' , '.', $rate->Value ) / $rate->Nominal , 4, '.', '');
@@ -160,7 +166,7 @@ function currency_converter_cron() {
     $check = db_select('currency_converter', 'c')->fields('c')->condition('conv_type', 1, '=')->execute()->fetchAssoc();      
 
     if ($check) {
-      $fields = array('byr' => $byr, 'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time);
+      $fields = array('byr' => $byr, 'ron' => $ron, 'aud' => $aud, 'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time);
       db_update('currency_converter')->condition('conv_type', 1)->fields($fields)->execute();      
     }
     else {
@@ -169,7 +175,7 @@ function currency_converter_cron() {
         'seo', 'раскрутка сайтов', 'раскрутка сайта', 'реклама в интернете'
       );
       $signature_selected = $signature[rand(0, 8)];      
-      $fields = array('conv_type' => 1, 'byr' => $byr, 'rub' => 0, 'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time, 'signature' => $signature_selected);
+      $fields = array('conv_type' => 1, 'byr' => $byr, 'aud' => 0, 'ron' => $ron, 'eur' => $eur, 'usd' => $usd, 'cad' => $cad, 'pln' => $pln, 'uah' => $uah, 'cny' => $cny, 'ltl' => $ltl, 'lvl' => $lvl, 'timestamp' => $time, 'signature' => $signature_selected);
       db_insert('currency_converter')->fields($fields)->execute();      
     }
   }  
@@ -197,10 +203,10 @@ function currency_converter_theme($existing, $type, $theme, $path) {
 function currency_converter_block_form() {
 
   $form                     = array();
-  $currencies               = array('BYR', 'RUB', 'EUR', 'USD', 'CAD', 'PLN', 'UAH', 'CNY', 'LTL', 'LVL');  
+  $currencies               = array('BYR', 'AUD', 'RON', 'EUR', 'USD', 'CAD', 'PLN', 'UAH', 'CNY', 'LTL', 'LVL');  
   $default_currency         = variable_get('currency_converter_main_currency', 'BYR');
-  $currency_types_enabled   = variable_get('currency_converter_currency_types', array('BYR', 'RUB', 'EUR', 'USD', 'CAD', 'PLN', 'UAH', 'CNY', 'LTL', 'LVL'));
-  $currency_weight          = variable_get('currency_converter_weight', array('BYR' => 0, 'RUB' => 0, 'EUR' => 0, 'USD' => 0, 'CAD' => 0, 'PLN' => 0, 'UAH' => 0, 'CNY' => 0, 'LTL' => 0, 'LVL' => 0));
+  $currency_types_enabled   = variable_get('currency_converter_currency_types', array('BYR', 'AUD', 'RON', 'EUR', 'USD', 'CAD', 'PLN', 'UAH', 'CNY', 'LTL', 'LVL'));
+  $currency_weight          = variable_get('currency_converter_weight', array('BYR' => 0, 'AUD' => 0, 'RON'=> 0, 'EUR' => 0, 'USD' => 0, 'CAD' => 0, 'PLN' => 0, 'UAH' => 0, 'CNY' => 0, 'LTL' => 0, 'LVL' => 0));
   $bank                     = variable_get('currency_converter_bank_default', 0);
   
   $currencies_values = db_select('currency_converter', 'c')
